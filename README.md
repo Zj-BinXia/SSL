@@ -5,7 +5,7 @@ This project is the official implementation of 'Structured Sparsity Learning for
 
 
 <p align="center">
-  <img src="figs/method.jpg" width="50%">
+  <img src="figs/method.png" width="80%">
 </p>
 
 ---
@@ -67,11 +67,9 @@ sh test_vid4_BD.sh
 ---
 ## Results
 <p align="center">
-  <img src="figs/quan-SR.jpg" width="90%">
+  <img src="figs/qual.png" width="90%">
 </p>
-<p align="center">
-  <img src="figs/qual-SR.jpg" width="90%">
-</p>
+
 
 ---
 
