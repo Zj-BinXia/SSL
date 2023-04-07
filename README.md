@@ -51,12 +51,20 @@ CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 bash ./scripts/dist_train.sh 8 options/trai
 
 ## :european_castle: Model Zoo
 
-Please download checkpoints from Google Drive.
+Please download checkpoints from [Google Drive](https://drive.google.com/drive/folders/1of6pPD1exn_VWnekIW-gmaY7jHLOlZvm).
 
 ---
 ## Testing
 ```bash
+#####Testing VSR bicubic ########
+
 sh test_reds_BI.sh
+
+test_vid4_BI.sh
+
+test_Vimeo_BI.sh
+
+#####Testing VSR BD ########
 
 sh test_udm10_BD.sh
 
