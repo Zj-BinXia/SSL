@@ -12,5 +12,5 @@ if [ $# -ne 2 ] ;then
 fi
 
 #PYTHONPATH="$(dirname $0)/..:${PYTHONPATH}" \
-python3 -m torch.distributed.launch --nproc_per_node=$GPUS --master_port=$PORT \
+python3 -m torch.distributed.launch --nproc_per_node=$GPUS --master_port=3459 \
     basicsr/test_prune_l1.py -opt $CONFIG --launcher pytorch

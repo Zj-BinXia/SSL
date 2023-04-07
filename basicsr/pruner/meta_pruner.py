@@ -391,3 +391,111 @@ class MetaPruner:
         # print the layer shape of pruned model
         LayerStruct(self.model, self.LEARNABLES, self.logger)
         return self.model
+
+    def _prune_and_build_new_modelV4(self):
+        if self.args.wg == 'weight':
+            self.masks = get_masks(self.layers, self.pruned_wg)
+            return
+        if self.opt["dist"]:
+            name_st = ["module.forward_trunk.main.0", "module.backward_trunk.main.0"]
+            name_forward = "module.forward_trunk.main.2.29.conv2"
+            name_backward = "module.backward_trunk.main.2.29.conv2"
+        else:
+            name_st = ["forward_trunk.main.0", "backward_trunk.main.0"]
+            name_forward = "forward_trunk.main.2.29.conv2"
+            name_backward = "backward_trunk.main.2.29.conv2"
+        new_model = copy.deepcopy(self.model)
+        for name, m in self.model.named_modules():
+            if isinstance(m, self.LEARNABLES):
+                kept_filter, kept_chl = get_kept_filter_channel(self.layers, name, m, pr=self.pr, kept_wg=self.kept_wg,
+                                                                kept_wg_pre=self.kept_wg_pre, opt=self.opt,
+                                                                wg=self.args.wg, name_st=name_st)
+
+                # get number of channels (can be manually assigned)
+                num_chl = self.args.layer_chl[name] if name in self.args.layer_chl else len(kept_chl)
+                # copy weight and bias
+                bias = False if isinstance(m.bias, type(None)) else True
+                if isinstance(m, nn.Conv2d):
+                    if "upconv" in name:
+                        scale = 2
+                        new_layer = nn.Conv2d(num_chl, len(kept_filter) * scale * scale, m.kernel_size,
+                                              m.stride, m.padding, m.dilation, m.groups, bias).cuda()
+                    else:
+
+                        new_layer = nn.Conv2d(num_chl, len(kept_filter), m.kernel_size,
+                                              m.stride, m.padding, m.dilation, m.groups, bias).cuda()
+                    if name_forward in name:
+                        self.num_feat_forward = len(kept_filter)
+                    if name_backward in name:
+                        self.num_feat_backward = len(kept_filter)
+
+
+                elif isinstance(m, nn.Linear):
+                    new_layer = nn.Linear(in_features=len(kept_chl), out_features=len(kept_filter), bias=bias).cuda()
+
+                # load the new conv
+                replace_module(new_model, name, new_layer)
+
+                # get the corresponding bn (if any) for later use
+                next_bn = get_next_bn(self.model, m)
+
+            elif isinstance(m, nn.BatchNorm2d) and m == next_bn:
+                new_bn = nn.BatchNorm2d(len(kept_filter), eps=m.eps, momentum=m.momentum,
+                                        affine=m.affine, track_running_stats=m.track_running_stats).cuda()
+
+                # copy bn weight and bias
+                if self.args.copy_bn_w:
+                    weight = m.weight.data[kept_filter]
+                    new_bn.weight.data.copy_(weight)
+                if self.args.copy_bn_b:
+                    bias = m.bias.data[kept_filter]
+                    new_bn.bias.data.copy_(bias)
+
+                # copy bn running stats
+                new_bn.running_mean.data.copy_(m.running_mean[kept_filter])
+                new_bn.running_var.data.copy_(m.running_var[kept_filter])
+                new_bn.num_batches_tracked.data.copy_(m.num_batches_tracked)
+
+                # load the new bn
+                replace_module(new_model, name, new_bn)
+
+        self.model = new_model
+
+        kept_wg_forward = []
+        kept_wg_pre_forward = []
+        kept_wg_backward = []
+        kept_wg_pre_backward = []
+        for i in range(30):
+            if self.opt["dist"]:
+                kept_wg_forward.append(sorted(self.kept_wg["module.forward_trunk.main.2.%d.conv2" % (i)]))
+                kept_wg_pre_forward.append(sorted(self.kept_wg_pre["module.forward_trunk.main.2.%d.conv1" % (i)]))
+                kept_wg_backward.append(sorted(self.kept_wg["module.backward_trunk.main.2.%d.conv2" % (i)]))
+                kept_wg_pre_backward.append(sorted(self.kept_wg_pre["module.backward_trunk.main.2.%d.conv1" % (i)]))
+            else:
+                kept_wg_forward.append(sorted(self.kept_wg["forward_trunk.main.2.%d.conv2" % (i)]))
+                kept_wg_pre_forward.append(sorted(self.kept_wg_pre["forward_trunk.main.2.%d.conv1" % (i)]))
+                kept_wg_backward.append(sorted(self.kept_wg["backward_trunk.main.2.%d.conv2" % (i)]))
+                kept_wg_pre_backward.append(sorted(self.kept_wg_pre["backward_trunk.main.2.%d.conv1" % (i)]))
+
+        if self.opt["dist"]:
+            self.model.module.num_feat_backward = self.num_feat_backward
+            self.model.module.num_feat_forward = self.num_feat_forward
+            self.model.module.pruned = True
+            self.model.module.pruned_final = True
+            self.model.module.kept_wg_forward = kept_wg_forward
+            self.model.module.kept_wg_pre_forward = kept_wg_pre_forward
+            self.model.module.kept_wg_backward = kept_wg_backward
+            self.model.module.kept_wg_pre_backward = kept_wg_pre_backward
+        else:
+            self.model.num_feat_backward = self.num_feat_backward
+            self.model.num_feat_forward = self.num_feat_forward
+            self.model.pruned = True
+            self.model.pruned_final = True
+            self.model.kept_wg_forward = kept_wg_forward
+            self.model.kept_wg_pre_forward = kept_wg_pre_forward
+            self.model.kept_wg_backward = kept_wg_backward
+            self.model.kept_wg_pre_backward = kept_wg_pre_backward
+
+        # print the layer shape of pruned model
+        LayerStruct(self.model, self.LEARNABLES, self.logger)
+        return self.model

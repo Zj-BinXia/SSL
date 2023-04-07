@@ -10,6 +10,7 @@ from basicsr.utils.dist_util import get_dist_info
 from basicsr.utils.registry import MODEL_REGISTRY
 from .video_base_model import VideoBaseModel
 import logging
+from basicsr.pruner.SSL_pruner import Pruner
 
 @MODEL_REGISTRY.register()
 class VideoRecurrentModelPruneL1(VideoBaseModel):
@@ -57,7 +58,6 @@ class VideoRecurrentModelPruneL1(VideoBaseModel):
             tp = torch.load(self.opt['path'].get('model_prune_init', None))
             log_file = osp.join(self.opt['path']['log'], f"Prune.log")
             logger = get_root_logger(logger_name='prune', log_level=logging.INFO, log_file=log_file)
-            from basicsr.pruner.SSL_pruner import Pruner
             self.pruner = Pruner(self.net_g, args, copy.deepcopy(opt), logger, train_sampler, prefetcher, val_loaders)
             self.pruner.pruned_wg = tp["pruned_wg"]
             self.pruner.kept_wg = tp["kept_wg"]
@@ -75,7 +75,7 @@ class VideoRecurrentModelPruneL1(VideoBaseModel):
         else:
             log_file = osp.join(self.opt['path']['log'], f"Prune.log")
             logger = get_root_logger(logger_name='prune', log_level=logging.INFO, log_file=log_file)
-            from basicsr.pruner.SSL_pruner import Pruner
+
 
             self.pruner = Pruner(self.net_g, args, copy.deepcopy(opt), logger, train_sampler, prefetcher, val_loaders)
             self.net_g = self.pruner.prune()
@@ -232,12 +232,20 @@ class VideoRecurrentModelPruneL1(VideoBaseModel):
 
         self.net_g.train()
 
-    def load_prune(self):
+    # def load_prune(self):
+    #     load_path = self.opt['path'].get('pretrain_network_pruned', None)
+    #     if load_path is not None:
+    #         print("load path ..........")
+    #         prune_info = torch.load(load_path)
+    #         self.net_g = prune_info["model"]
+    def load_prune(self, args, opt):
         load_path = self.opt['path'].get('pretrain_network_pruned', None)
         if load_path is not None:
             print("load path ..........")
             prune_info = torch.load(load_path)
-            self.net_g = prune_info["model"]
-
+            log_file = osp.join(self.opt['path']['log'], f"Prune.log")
+            logger = get_root_logger(logger_name='prune', log_level=logging.INFO, log_file=log_file)
+            self.pruner = Pruner(self.net_g, args, copy.deepcopy(opt), logger)
+            self.net_g = self.pruner.load_prune(prune_info)
 
 

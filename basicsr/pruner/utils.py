@@ -89,7 +89,7 @@ def set_same_pruned(model, pr, pruned_wg, kept_wg, constrained, wg='filter', cri
             pruned_wg[name], kept_wg[name] = pruned, kept
     return pruned_wg, kept_wg
 
-def get_score_layer(name,module, wg='filter', criterion='l1-norm',k=1):
+def get_score_layer(name,module, wg='filter', criterion='l1-norm'):
     r"""Get importance score for a layer.
 
     Return:
@@ -106,7 +106,6 @@ def get_score_layer(name,module, wg='filter', criterion='l1-norm',k=1):
             l1 = module.weight.abs().view(-1,num_fea*scale*scale,3,3).mean(dim=[1, 2, 3]) if len(shape) == 4 else module.weight.abs().mean(dim=1)
         elif wg == "weight":
             l1 = module.weight.abs().flatten()
-        l1*=k
     else:
         if wg == "channel":
             l1 = module.weight.abs().mean(dim=[0, 2, 3]) if len(shape) == 4 else module.weight.abs().mean(dim=0)
@@ -120,9 +119,9 @@ def get_score_layer(name,module, wg='filter', criterion='l1-norm',k=1):
     out = {}
     out['l1-norm'] = tensor2array(l1)
     if "upconv" in name:
-        out['act_scale'] = tensor2array(k*module.act_scale.abs().view(-1)) if hasattr(module, 'act_scale') else [1e30] * (module.weight.size(0)//4)
+        out['act_scale'] = tensor2array(module.act_scale.abs().view(-1)) if hasattr(module, 'act_scale') else [1e30] * (module.weight.size(0)//4)
         if hasattr(module, 'act_scale_pre'):
-            out['act_scale_pre'] = tensor2array(k*module.act_scale_pre.abs().view(-1))
+            out['act_scale_pre'] = tensor2array(module.act_scale_pre.abs().view(-1))
         else:
             out['act_scale_pre'] = [1e30] * module.weight.size(1)
     else:

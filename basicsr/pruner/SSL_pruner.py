@@ -31,13 +31,14 @@ class Pruner(MetaPruner, VideoBaseModel_pruned):
         # ************************** variables from RCAN **************************
 
         self.error_last = 1e8
-        self.optimizers = []
-        self.fix_flow_iter = self.args.fix_flow_iter
-        self.setup_optimizers()
-        self.cri_pix = build_loss(self.opt["train"]['pixel_opt'])
-        self.train_sampler = train_sampler
-        self.prefetcher = prefetcher
-        self.val_loaders = val_loaders
+        if self.opt["is_train"]:
+            self.optimizers = []
+            self.fix_flow_iter = self.args.fix_flow_iter
+            self.setup_optimizers()
+            self.cri_pix = build_loss(self.opt["train"]['pixel_opt'])
+            self.train_sampler = train_sampler
+            self.prefetcher = prefetcher
+            self.val_loaders = val_loaders
         # Reg related variables
         self.reg = {}
         self.reg_pre = {}
@@ -56,8 +57,9 @@ class Pruner(MetaPruner, VideoBaseModel_pruned):
         self.prune_state = 'update_reg'
         
         # init pruned_wg/kept_wg if they can be determined right at the begining
-        if args.greg_mode in ['part'] and self.prune_state in ['update_reg']:
-            self._get_kept_wg_L1(align_constrained=False) # this will update the 'self.kept_wg', 'self.pruned_wg', 'self.pr'
+        if self.opt["is_train"]:
+            if args.greg_mode in ['part'] and self.prune_state in ['update_reg']:
+                self._get_kept_wg_L1(align_constrained=False) # this will update the 'self.kept_wg', 'self.pruned_wg', 'self.pr'
 
     def _init_reg(self):
         for name, m in self.model.named_modules():
@@ -157,6 +159,15 @@ class Pruner(MetaPruner, VideoBaseModel_pruned):
                         self.prune_state = 'stabilize_reg'
                         self.iter_stabilize_reg = self.total_iter
                         self.logger.info("==> All layers just finished 'update_reg', go to 'stabilize_reg'. Iter = %d" % self.total_iter)
+    
+    def load_prune(self,prune_info):
+        self.pruned_wg=prune_info['pruned_wg']
+        self.kept_wg=prune_info['kept_wg']
+        self.kept_wg_pre=prune_info['kept_wg_pre']
+        state_dict=prune_info['state_dict']
+        self._prune_and_build_new_modelV4()
+        self.model.load_state_dict(state_dict, strict=True)
+        return self.model
 
     def _apply_reg(self):
         for name, m in self.model.named_modules():

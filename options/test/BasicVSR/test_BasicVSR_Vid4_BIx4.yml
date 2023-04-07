@@ -1,4 +1,4 @@
-name: BasicVSR_Vimeo90K_BD
+name: BasicVSR_Vid4_BI
 model_type: VideoRecurrentModelPruneL1
 scale: 4
 num_gpu: 1  # set num_gpu: 0 for cpu mode
@@ -6,15 +6,16 @@ manual_seed: 0
 
 datasets:
   test_1:  # the 1st test dataset
-    name: Vimeo90K
-    type: VideoTestVimeo90KDataset
-    dataroot_gt: /mnt/bn/xiabinsr/datasets/vimeo90k/vimeo_septuplet/sequences
-    dataroot_lq: /mnt/bn/xiabinsr/datasets/vimeo90k/BDx4
-    meta_info_file: basicsr/data/meta_info/meta_info_Vimeo90K_test_GT.txt
-    cache_data: false
+    name: Vid4
+    type: VideoRecurrentTestDataset
+    dataroot_gt: /mnt/bn/xiabinsr/datasets/vid4/GT
+    dataroot_lq: /mnt/bn/xiabinsr/datasets/vid4/BIx4
+
+    cache_data: True
     io_backend:
       type: disk
-    num_frame: 7
+
+    num_frame: -1  # not needed
 
 
 # network structures
@@ -22,20 +23,20 @@ network_g:
   type: BasicVSR
   num_feat: 64
   num_block: 30
-  spynet_path: experiments/pretrained_models/flownet/spynet_sintel_final-3d2a1287.pth
+  spynet_path: ~
 
 # path
 path:
-  pretrain_network_pruned: experiments/pretrained_models/Vimeo_BD/SSL_Vimeo_BD.pt
+  pretrain_network_pruned: experiments/pretrained_models/Vimeo_BI/SSL_Vimeo_BI.pt
   pretrain_network_g_pruned: ~
   pretrain_network_g: ~
   strict_load_g: true
 
 # validation settings
 val:
-  save_img: false
+  save_img: true
   flip_seq: true
-  center_frame_only: true
+  center_frame_only: false
   suffix: ~  # add suffix to saved images, if None, use exp name
 
   metrics:
