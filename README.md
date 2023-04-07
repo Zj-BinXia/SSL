@@ -60,17 +60,17 @@ Please download checkpoints from [Google Drive](https://drive.google.com/drive/f
 
 sh test_reds_BI.sh
 
-test_vid4_BI.sh
+sh test_vid4_BI.sh
 
-test_Vimeo_BI.sh
+sh test_Vimeo_BI.sh
 
 #####Testing VSR BD ########
 
-sh test_udm10_BD.sh
+sh sh test_udm10_BD.sh
 
-sh test_Vimeo_BD.sh
+sh sh test_Vimeo_BD.sh
 
-sh test_vid4_BD.sh
+sh sh test_vid4_BD.sh
 ```
 ---
 ## Results
