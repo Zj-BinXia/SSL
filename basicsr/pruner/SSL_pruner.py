@@ -315,6 +315,7 @@ class Pruner(MetaPruner, VideoBaseModel_pruned):
             self.gt = train_data['gt'].to(self.device)
 
             finished = self.optimize_parameters(self.total_iter)
+            train_data = self.prefetcher.next()
             if finished:
                 return True
 
