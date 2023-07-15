@@ -12,8 +12,10 @@ This project is the official implementation of 'Structured Sparsity Learning for
 
 ##  Dependencies and Installation
 
-- Python >= 3.8 (Recommend to use [Anaconda](https://www.anaconda.com/download/#linux) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html))
-- [PyTorch >= 1.10](https://pytorch.org/)
+- Python == 3.8 (Recommend to use [Anaconda](https://www.anaconda.com/download/#linux) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html))
+- [PyTorch == 1.10](https://pytorch.org/)
+- basicsr == 1.3.5
+
 
 
 ## Dataset Preparation
