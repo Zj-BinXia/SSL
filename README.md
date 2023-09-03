@@ -1,7 +1,6 @@
-# SSL
+# Structured Sparsity Learning for Efficient Video Super-Resolution (CVPR2023)
 
-This project is the official implementation of 'Structured Sparsity Learning for Efficient Video Super-Resolution', CVPR2023
-> **Structured Sparsity Learning for Efficient Video Super-Resolution [[Paper](https://arxiv.org/pdf/2206.07687.pdf)] [[Project](https://github.com/Zj-BinXia/SSL)]**
+[Paper](https://arxiv.org/pdf/2206.07687.pdf)] | [Project](https://github.com/Zj-BinXia/SSL) | [pretrained models](https://drive.google.com/drive/folders/1of6pPD1exn_VWnekIW-gmaY7jHLOlZvm)
 
 
 <p align="center">
