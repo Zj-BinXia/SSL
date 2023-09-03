@@ -4,7 +4,7 @@
 
 
 <p align="center">
-  <img src="figs/method.png" width="80%">
+  <img src="figs/method.png" width="100%">
 </p>
 
 ---
