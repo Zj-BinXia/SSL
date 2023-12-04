@@ -1,9 +1,9 @@
 # Structured Sparsity Learning for Efficient Video Super-Resolution (CVPR2023)
 
-[Paper](https://arxiv.org/pdf/2206.07687.pdf) | [Project](https://github.com/Zj-BinXia/SSL) | [pretrained models](https://drive.google.com/drive/folders/1of6pPD1exn_VWnekIW-gmaY7jHLOlZvm) | [Visual Results](https://drive.google.com/drive/folders/132IhIPY9KxjR9Gelj6DJT4Fvx33i2Coc?usp=drive_link)
+[Paper](https://arxiv.org/pdf/2206.07687.pdf) | [Project](https://github.com/Zj-BinXia/SSL) | [pretrained models](https://drive.google.com/drive/folders/1of6pPD1exn_VWnekIW-gmaY7jHLOlZvm) | [Visual Results](https://drive.google.com/drive/folders/132IhIPY9KxjR9Gelj6DJT4Fvx33i2Coc?usp=sharing)
 
 #### News
-- [x] [2023.12.04]   🔥 For easy visual comparison with SSL, we have uploaded relevant [visual results](https://drive.google.com/drive/folders/132IhIPY9KxjR9Gelj6DJT4Fvx33i2Coc?usp=drive_link).
+- [x] [2023.12.04]   🔥 For easy visual comparison with SSL, we have uploaded relevant [visual results](https://drive.google.com/drive/folders/132IhIPY9KxjR9Gelj6DJT4Fvx33i2Coc?usp=sharing).
 
 <hr />
 
