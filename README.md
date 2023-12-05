@@ -75,11 +75,11 @@ sh test_Vimeo_BI.sh
 
 #####Testing VSR BD ########
 
-sh sh test_udm10_BD.sh
+sh test_udm10_BD.sh
 
-sh sh test_Vimeo_BD.sh
+sh test_Vimeo_BD.sh
 
-sh sh test_vid4_BD.sh
+sh test_vid4_BD.sh
 ```
 ---
 ## Results
