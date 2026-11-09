@@ -731,7 +731,7 @@ def merge_args(args, params_json):
     '''<args> is from argparser. <params_json> is a json/yaml file.
     merge them, if there is collision, the param in <params_json> has a higher priority.
     '''
-    with open(params_json) as f:
+    with open(params_json, encoding='utf-8') as f:
         if params_json.endswith('.json'):
             params = json.load(f)
         elif params_json.endswith('.yaml'):
